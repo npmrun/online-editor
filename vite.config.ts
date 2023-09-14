@@ -27,14 +27,19 @@ export default defineConfig(({ _, mode }) => {
       vue(),
       createHtmlPlugin({
         minify: true,
-        entry: '../src/main.ts',
-        template: 'html/index.html',
-        inject: {
-          data: {
-            title: 'index',
-          },
-          tags: [],
-        },
+        pages: [
+          {
+            entry: '../src/main.ts',
+            filename: 'index.html',
+            template: 'html/index.html',
+            injectOptions: {
+              data: {
+                title: 'index',
+              },
+              tags: [],
+            },
+          }
+        ]
       }),
     ],
   };
