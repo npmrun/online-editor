@@ -27,7 +27,7 @@ export default defineConfig(({ _, mode }) => {
       vue(),
       createHtmlPlugin({
         minify: true,
-        entry: 'src/main.ts',
+        entry: '../src/main.ts',
         template: 'html/index.html',
         inject: {
           data: {
