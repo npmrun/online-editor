@@ -1,6 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { createHtmlPlugin } from 'vite-plugin-html-transform';
 import path from 'path';
 
 // https://vitejs.dev/config/
@@ -24,23 +23,7 @@ export default defineConfig(({ _, mode }) => {
       },
     },
     plugins: [
-      vue(),
-      createHtmlPlugin({
-        minify: true,
-        pages: [
-          {
-            entry: '../src/main.ts',
-            filename: 'index.html',
-            template: 'html/index.html',
-            injectOptions: {
-              data: {
-                title: 'online-editor',
-              },
-              tags: [],
-            },
-          }
-        ]
-      }),
+      vue()
     ],
   };
 });
