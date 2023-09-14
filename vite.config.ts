@@ -34,7 +34,7 @@ export default defineConfig(({ _, mode }) => {
             template: 'html/index.html',
             injectOptions: {
               data: {
-                title: 'index',
+                title: 'online-editor',
               },
               tags: [],
             },
