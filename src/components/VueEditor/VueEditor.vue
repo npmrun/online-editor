@@ -7,6 +7,7 @@ import { utoa, atou } from '@/utils';
 
 // retrieve some configuration options from the URL
 const query = new URLSearchParams(location.search);
+console.log(JSON.parse(atou(location.hash.slice(1))));
 
 const store = new ReplStore({
   // initialize repl with previously serialized state
@@ -32,13 +33,13 @@ const store = new ReplStore({
 watchEffect(() => history.replaceState({}, '', store.serialize()))
 
 // pre-set import map
-store.setImportMap({
-  imports: {
-    vue: 'https://play.vuejs.org/vue.runtime.esm-browser.js',
-    'vue/server-renderer':
-      'https://play.vuejs.org/server-renderer.esm-browser.js',
-  },
-});
+// store.setImportMap({
+//   imports: {
+//     vue: 'https://play.vuejs.org/vue.runtime.esm-browser.js',
+//     'vue/server-renderer':
+//       'https://play.vuejs.org/server-renderer.esm-browser.js',
+//   },
+// });
 
 // use a specific version of Vue
 store.setVueVersion('3.3.4');
