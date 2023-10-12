@@ -26,8 +26,8 @@ if (window.frames.length != parent.frames.length) {
 </script>
 
 <template>
-  <div style="height: 100%;display: flex;flex-direction: column;" :class="isInIframe?'in-iframe':''">
-    <div>
+  <div style="height: 100%;display: flex;flex-direction: column;" :class="isInIframe ? 'in-iframe' : ''">
+    <div class="header">
       <a href="/" class="mr-5">flem</a>
       <a href="/?vue" class="mr-5">vue3 sfc</a>
       <a href="/?sand-react-js">sand-react-js</a>
@@ -46,4 +46,8 @@ if (window.frames.length != parent.frames.length) {
 
 <style>
 @import '@/assets/style/common.scss';
+
+.in-iframe .header {
+  display: none;
+}
 </style>
