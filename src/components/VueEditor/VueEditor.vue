@@ -7,7 +7,6 @@ import { utoa, atou } from '@/utils';
 
 // retrieve some configuration options from the URL
 const query = new URLSearchParams(location.search);
-console.log(JSON.parse(atou(location.hash.slice(1))));
 
 const store = new ReplStore({
   // initialize repl with previously serialized state

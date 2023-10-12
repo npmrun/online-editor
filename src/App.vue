@@ -18,18 +18,30 @@ if (query.has('flems')) {
 if (query.has('sand-react-js')) {
   curEditor.value = 'sand-react-js';
 }
+
+let isInIframe = ref(false)
+if (window.frames.length != parent.frames.length) {
+  isInIframe.value = true
+} 
 </script>
 
 <template>
-  <template v-if="curEditor === 'vue'">
-    <VueEditor class="h-[100%]"></VueEditor>
-  </template>
-  <template v-if="curEditor === 'flems'">
-    <FlemsEditor class="h-[100%]"></FlemsEditor>
-  </template>
-  <template v-if="curEditor === 'sand-react-js'">
-    <SandPack></SandPack>
-  </template>
+  <div style="height: 100%;display: flex;flex-direction: column;" :class="isInIframe?'in-iframe':''">
+    <div>
+      <a href="/" class="mr-5">flem</a>
+      <a href="/?vue" class="mr-5">vue3 sfc</a>
+      <a href="/?sand-react-js">sand-react-js</a>
+    </div>
+    <template v-if="curEditor === 'vue'">
+      <VueEditor class="h-[100%]"></VueEditor>
+    </template>
+    <template v-if="curEditor === 'flems'">
+      <FlemsEditor class="h-[100%]"></FlemsEditor>
+    </template>
+    <template v-if="curEditor === 'sand-react-js'">
+      <SandPack></SandPack>
+    </template>
+  </div>
 </template>
 
 <style>
