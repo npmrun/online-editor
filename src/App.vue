@@ -50,4 +50,7 @@ if (window.frames.length != parent.frames.length) {
 .in-iframe .header {
   display: none;
 }
+.in-iframe .hide-iframe {
+  display: none;
+}
 </style>
