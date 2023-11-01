@@ -48,9 +48,9 @@ if (window.frames.length != parent.frames.length) {
 @import '@/assets/style/common.scss';
 
 .in-iframe .header {
-  display: none;
+  display: none !important;
 }
 .in-iframe .hide-iframe {
-  display: none;
+  display: none !important;
 }
 </style>
