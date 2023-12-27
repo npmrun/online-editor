@@ -63,6 +63,11 @@ watch(
     }
 )
 
+let isInIframe = ref(false)
+if (window.frames.length != parent.frames.length) {
+    isInIframe.value = true
+}
+
 const flemsEditor = ref<HTMLElement>()
 let flems: any
 onMounted(() => {
@@ -72,6 +77,8 @@ onMounted(() => {
             {
                 files: JSON.parse(JSON.stringify(unref(filelist))),
                 links: JSON.parse(JSON.stringify(unref(links))),
+                shareButton: false,
+                middle: isInIframe.value ? 0 : 50
             },
             '/runtime.html'
         )
@@ -128,7 +135,7 @@ function handleDeleteLink(item: any, index: any) {
         })
 }
 function handleAddLink() {
-    if(state.url && typeof state.url === "string" && !(state.url as string).startsWith('http://') && !(state.url as string).startsWith('https://')) {
+    if (state.url && typeof state.url === "string" && !(state.url as string).startsWith('http://') && !(state.url as string).startsWith('https://')) {
         alert("Link url's should start with http:// or https://")
         return
     }
@@ -164,61 +171,36 @@ function addReset() {
         </div>
         <div class="hide-iframe" style="display: flex">
             <div style="flex: 1; display: inline-block">
-                文件-<button @click="handleAddFile">增加文件</button
-                ><input
-                    style="border: 1px solid #000"
-                    v-model="tempFileName"
-                    placeholder="请输入文件名"
-                    type="text"
-                />
+                文件-<button @click="handleAddFile">增加文件</button><input style="border: 1px solid #000" v-model="tempFileName"
+                    placeholder="请输入文件名" type="text" />
             </div>
             <div style="flex: 1; display: inline-block">
-                额外链接-<button @click="handleAddLink">增加文件</button
-                ><input
-                    style="border: 1px solid #000"
-                    v-model="state.name"
-                    placeholder="请输入文件名"
-                    type="text"
-                />-<select v-model="state.type">
+                额外链接-<button @click="handleAddLink">增加文件</button><input style="border: 1px solid #000" v-model="state.name"
+                    placeholder="请输入文件名" type="text" />-<select v-model="state.type">
                     <option value="script" name="aa">script</option>
-                    <option value="style" name="aa">style</option></select
-                ><input
-                    style="border: 1px solid #000"
-                    v-model="state.url"
-                    placeholder="请输入地址"
-                    type="text"
-                />
+                    <option value="style" name="aa">style</option>
+                </select><input style="border: 1px solid #000" v-model="state.url" placeholder="请输入地址" type="text" />
             </div>
         </div>
         <div class="hide-iframe" style="display: flex">
-            <div
-                style="
+            <div style="
                     flex: 1;
                     display: inline-block;
                     max-height: 80px;
                     overflow: auto;
-                "
-            >
-                <div
-                    v-for="(item, index) in filelist"
-                    style="display: inline-block; margin: 0 10px"
-                    @dblclick="handleDeleteFile(item, index)"
-                >
+                ">
+                <div v-for="(item, index) in filelist" style="display: inline-block; margin: 0 10px"
+                    @dblclick="handleDeleteFile(item, index)">
                     {{ item.name }}
                 </div>
             </div>
-            <div
-                style="
+            <div style="
                     flex: 1;
                     display: inline-block;
                     max-height: 80px;
                     overflow: auto;
-                "
-            >
-                <div
-                    v-for="(item, index) in links"
-                    @dblclick="handleDeleteLink(item, index)"
-                >
+                ">
+                <div v-for="(item, index) in links" @dblclick="handleDeleteLink(item, index)">
                     {{ item.name }}-{{ item.type }}-{{ item.url }}
                 </div>
             </div>
