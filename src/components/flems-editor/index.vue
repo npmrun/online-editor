@@ -128,7 +128,14 @@ function handleDeleteLink(item: any, index: any) {
         })
 }
 function handleAddLink() {
-    links.value.push(toRaw(state))
+    if(state.url && typeof state.url === "string" && !(state.url as string).startsWith('http://') && !(state.url as string).startsWith('https://')) {
+        alert("Link url's should start with http:// or https://")
+        return
+    }
+    links.value.push(JSON.parse(JSON.stringify(toRaw(state))))
+    state.name = undefined
+    state.type = undefined
+    state.url = undefined
     flems.set({
         files: JSON.parse(JSON.stringify(unref(filelist))),
         links: JSON.parse(JSON.stringify(unref(links))),
