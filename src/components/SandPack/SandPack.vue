@@ -97,8 +97,6 @@ watch(
 );
 
 function handleChange(code) {
-  console.log(code);
-
   filelist.value = code
 }
 
