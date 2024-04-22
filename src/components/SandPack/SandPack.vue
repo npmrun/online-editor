@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watchEffect, onMounted, watch, shallowRef, toRaw, unref } from 'vue';
+import { watchEffect, onMounted, watch, shallowRef, toRaw, unref, ref, triggerRef } from 'vue';
 import Inner from './Inner.vue';
 import { utoa, atou } from '@/utils';
 import {
@@ -89,7 +89,7 @@ if (location.hash) {
 watch(
   () => filelist.value,
   (obj) => {
-    setTimeout(()=>{history.replaceState({}, '', '#' + utoa(JSON.stringify(toRaw(obj))));})
+    setTimeout(() => { history.replaceState({}, '', '#' + utoa(JSON.stringify(toRaw(obj)))); })
   },
   {
     deep: true,
@@ -97,13 +97,42 @@ watch(
 );
 
 function handleChange(code) {
+  console.log(code);
+
   filelist.value = code
+}
+
+const sandpackKey = ref(0)
+const fileNameRef = ref("")
+function handleAddFile() {
+  let name = fileNameRef.value.startsWith("/") ? fileNameRef.value : ('/' + fileNameRef.value)
+  if (filelist.value[name]) {
+    alert("已存在该文件")
+    return
+  }
+  filelist.value[name] = { code: "" }
+  triggerRef(filelist)
+  sandpackKey.value++
+  fileNameRef.value = ""
+}
+
+function handleRemove() {
+  let name = fileNameRef.value.startsWith("/") ? fileNameRef.value : ('/' + fileNameRef.value)
+  if (filelist.value[name]) {
+    if (confirm("是否删除该文件")) {
+      delete filelist.value[name]
+      sandpackKey.value++
+      fileNameRef.value = ""
+    }
+  }
 }
 </script>
 
 <template>
   <div class="wrapper">
-    <SandpackProvider :files="rawFiles" template="react">
+    <input type="text" placeholder="路径" v-model="fileNameRef"> <button @click="handleAddFile">添加</button> <button
+      @click="handleRemove">删除</button>
+    <SandpackProvider :key="sandpackKey" :files="rawFiles" template="react">
       <SandpackLayout>
         <SandpackFileExplorer />
         <SandpackCodeEditor closableTabs />
@@ -117,12 +146,15 @@ function handleChange(code) {
 <style lang="scss" scoped>
 .wrapper {
   height: 100%;
+
   :deep(.sp-wrapper) {
     height: 100%;
   }
+
   :deep(.sp-layout) {
     height: 100%;
   }
+
   :deep(.sp-layout > *) {
     height: 100%;
   }
