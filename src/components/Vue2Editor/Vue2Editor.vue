@@ -2,7 +2,6 @@
 import { watchEffect } from 'vue'
 import { Repl, ReplStore } from 'vue2-repl'
 import Monaco from '@vue/repl/monaco-editor';
-import 'vue2-repl/style.css'
 import { utoa, atou } from '@/utils';
 
 // https://github.com/Thy3634/vue2-repl

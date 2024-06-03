@@ -3,6 +3,7 @@ import FlemsEditor from '@/components/flems-editor/index.vue';
 import VueEditor from '@/components/VueEditor/VueEditor.vue';
 import Vue2Editor from '@/components/Vue2Editor/Vue2Editor.vue';
 import SandPack from '@/components/SandPack/SandPack.vue';
+import codeplayer from '@/components/codeplayer/index.vue';
 
 import { utoa, atou } from '@/utils';
 import { ref, watchEffect, toRaw, watch } from 'vue';
@@ -25,6 +26,9 @@ if (query.has('flems')) {
 if (query.has('sand-react-js')) {
   curEditor.value = 'sand-react-js';
 }
+if (query.has('player')) {
+  curEditor.value = 'player';
+}
 
 let isInIframe = ref(false)
 if (window.frames.length != parent.frames.length) {
@@ -39,7 +43,8 @@ if (window.frames.length != parent.frames.length) {
       <a href="/?vue" class="mr-5">vue3 sfc</a>
       <a href="/?vue27" class="mr-5">vue2.7 sfc</a>
       <a href="/?vue26#eNo9T9FuwyAM/BXLT5u0gtJKe4hYtf0HL6x4K1MgCJxsUpR/n0naIgQ+22ffLfiRs5onwh5NvZSQ+WwT/eWxMHj6ctPAsNgE4B27p+ctBCjEU0l7oZ1Yv3vojqcdr+2TR67Rj6ECmGIeHJMgAOPDvAUSXrvzsrQpsK5GC7rlQ8oTw3yIo6fhzaJ0WNzZeqcb/RiKLxhiE36ILqufOiYxtUm0t0K12N9FWxTXDVu8Mufaa33xSWiyKcxFJWKdctTS9X5Ur6o7ycbKDSuqUX2W8bdSEYLFu19c/wFNam6P" class="mr-5">vue2.6 sfc</a>
-      <a href="/?sand-react-js">sand-react-js</a>
+      <a href="/?sand-react-js" class="mr-5">sand-react-js</a>
+      <a href="/?player">codeplayer</a>
     </div>
     <template v-if="curEditor === 'vue'">
       <VueEditor class="h-[100%]"></VueEditor>
@@ -52,6 +57,9 @@ if (window.frames.length != parent.frames.length) {
     </template>
     <template v-if="curEditor === 'sand-react-js'">
       <SandPack></SandPack>
+    </template>
+    <template v-if="curEditor === 'player'">
+      <codeplayer></codeplayer>
     </template>
   </div>
 </template>
