@@ -65,4 +65,8 @@ if (window.frames.length != parent.frames.length) {
 .in-iframe .hide-iframe {
   display: none !important;
 }
+
+.CodeMirror.cm-s-default{
+  height: 100%;
+}
 </style>
