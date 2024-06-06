@@ -9,12 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bytemd/plugin-breaks": "^1.21.0",
+    "@bytemd/plugin-frontmatter": "^1.21.0",
+    "@bytemd/plugin-gfm": "^1.21.0",
+    "@bytemd/vue-next": "^1.21.0",
     "@vue/repl": "^2.5.8",
     "@vueuse/core": "^10.4.1",
+    "bytemd": "^1.21.0",
     "codeplayer": "^0.3.0",
     "fflate": "^0.8.0",
     "flems": "^1.5.10",
+    "hastscript": "^9.0.0",
+    "remark-directive": "^2.0.1",
     "sandpack-vue3": "^3.1.7",
+    "unist-util-visit": "^5.0.0",
+    "uuid": "^9.0.1",
     "vue": "^3.3.4",
     "vue2-repl": "^0.2.1"
   },
