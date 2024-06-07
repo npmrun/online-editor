@@ -72,7 +72,7 @@ function throttle(fn, delay) {
     }
   }
 }
-const updateR = throttle(()=>chrome.runtime.sendMessage(window.ChromeExtensionID, { command: "update" }, (res)=>{
+const updateR = throttle(()=>window.ChromeUpdateBookmarkUrl().then((res)=>{
   console.log(res)
   if(!res) {
     alert("更新收藏的网址失败，请注意可能造成数据丢失")
@@ -85,13 +85,13 @@ const updateR = throttle(()=>chrome.runtime.sendMessage(window.ChromeExtensionID
   }
 }), 500)
 watchEffect(() => {
-  if(window.ChromeExtensionID) {
+  if(window.ChromeUpdateBookmarkUrl) {
     updateR();
   }
   history.replaceState({}, '', `?md&uuid=${window.uuid}#` + utoa(text.value))
 })
 function handleChangeCode(a: string) {
-  if(!window.ChromeExtensionID && !init) {
+  if(!window.ChromeUpdateBookmarkUrl && !init) {
     alert("尚检测到插件ID，无法更新收藏的网址，请注意可能造成数据丢失")
   }
   init = false
