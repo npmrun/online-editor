@@ -77,6 +77,9 @@ const updateR = throttle(()=>chrome.runtime.sendMessage(window.ChromeExtensionID
   if(!res) {
     alert("更新收藏的网址失败，请注意可能造成数据丢失")
   }
+  if(res.code === 2) {
+    alert(res.message)
+  }
   if(res.code === 3) {
     alert(res.message)
   }
