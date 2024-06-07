@@ -85,12 +85,14 @@ const updateR = throttle(()=>window.ChromeUpdateBookmarkUrl().then((res)=>{
   }
 }), 500)
 watchEffect(() => {
+  if(!query.has('md')) return
   if(window.ChromeUpdateBookmarkUrl) {
     updateR();
   }
   history.replaceState({}, '', `?md&uuid=${window.uuid}#` + utoa(text.value))
 })
 function handleChangeCode(a: string) {
+  if(!query.has('md')) return
   if(!window.ChromeUpdateBookmarkUrl && !init) {
     alert("尚检测到插件ID，无法更新收藏的网址，请注意可能造成数据丢失")
   }
