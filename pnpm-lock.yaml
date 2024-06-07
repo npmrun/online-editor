@@ -17,6 +17,9 @@ dependencies:
   '@bytemd/vue-next':
     specifier: ^1.21.0
     version: 1.21.0(vue@3.3.13)
+  '@noderun/flems':
+    specifier: ^1.5.11
+    version: 1.5.11
   '@vue/repl':
     specifier: ^2.5.8
     version: 2.9.0
@@ -32,9 +35,6 @@ dependencies:
   fflate:
     specifier: ^0.8.0
     version: 0.8.1
-  flems:
-    specifier: ^1.5.10
-    version: 1.5.10
   hastscript:
     specifier: ^9.0.0
     version: 9.0.0
@@ -560,6 +560,10 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.16.0
     dev: true
+
+  /@noderun/flems@1.5.11:
+    resolution: {integrity: sha512-lCdkySRGbmrHd4kAEUWBFmCMZkII34qK2rXvrcpOvzKMrARda2jNsSi7W3fjTZdWUZDiahJR7OWOdyw0pfhWyw==}
+    dev: false
 
   /@open-draft/deferred-promise@2.2.0:
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
@@ -1217,10 +1221,6 @@ packages:
     dependencies:
       to-regex-range: 5.0.1
     dev: true
-
-  /flems@1.5.10:
-    resolution: {integrity: sha512-MAQrgySQ7FfNqkmxjJhk/eE/LkaVIgZeHAO0sO68A2w3ugT7r1wWKYcyhPCXMZtL+NakVIDC7BFDNmc2yIPL/w==}
-    dev: false
 
   /foreground-child@3.1.1:
     resolution: {integrity: sha512-TMKDUnIte6bfb5nWv7V/caI169OHgvwjb7V4WkeUvbQQdjr5rWKqHFiKWb/fcOwB+CzBT+qbWjvj+DVwRskpIg==}

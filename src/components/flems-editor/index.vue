@@ -9,7 +9,7 @@ import {
     reactive,
     computed,
 } from 'vue'
-import Flems from 'flems/dist/flems.js'
+import Flems from '@noderun/flems/dist/flems.js'
 import { useVModel } from '@vueuse/core'
 import { utoa, atou } from '@/utils'
 
@@ -75,6 +75,7 @@ onMounted(() => {
         flems = Flems(
             flemsEditor.value,
             {
+                compilerURL: "/compilers",
                 files: JSON.parse(JSON.stringify(unref(filelist))),
                 links: JSON.parse(JSON.stringify(unref(links))),
                 shareButton: false,
