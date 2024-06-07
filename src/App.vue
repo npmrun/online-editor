@@ -74,8 +74,11 @@ function throttle(fn, delay) {
 }
 const updateR = throttle(()=>chrome.runtime.sendMessage(window.ChromeExtensionID, { command: "update" }, (res)=>{
   console.log(res)
-  if(!res.code || !res) {
+  if(!res) {
     alert("更新收藏的网址失败，请注意可能造成数据丢失")
+  }
+  if(res.code === 3) {
+    alert(res.message)
   }
 }), 500)
 watchEffect(() => {
