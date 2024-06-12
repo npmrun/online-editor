@@ -68,6 +68,7 @@ if(query.has('md')) {
   })
   window.addEventListener('beforeunload',
     function (e) {
+        conosle.log(result.string)
         if (result.string !== '' || !window.ChromeUpdateBookmarkUrl) {
           e.preventDefault();
           e.returnValue = '';
@@ -90,7 +91,9 @@ const updateR = throttle(()=>window.ChromeUpdateBookmarkUrl().then((res)=>{
   if(!res) {
     result.value = "更新收藏的网址失败，请注意可能造成数据丢失"
   }
-  if(res.code === 2) {
+  if(res.code === 1) {
+    result.value = res.message
+  } else if(res.code === 2) {
     result.value = res.message
   } else if(res.code === 3) {
     result.value = res.message
