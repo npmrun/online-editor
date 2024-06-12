@@ -49,7 +49,7 @@ if (window.frames.length != parent.frames.length) {
 } 
 
 const text = ref("")
-let init = true
+const result = ref("")
 if (location.hash && query.has('md')) {
     try {
         const data = atou(location.hash.slice(1))
@@ -60,7 +60,20 @@ if (location.hash && query.has('md')) {
         console.error(e)
     }
 }
-
+if(query.has('md')) {
+  onMounted(() => {
+    if(!window.ChromeUpdateBookmarkUrl) {
+        alert("尚检测到插件ID，无法更新收藏的网址，请注意可能造成数据丢失")
+    }
+  })
+  window.addEventListener('beforeunload',
+    function (e) {
+        if (result.string !== '' || !window.ChromeUpdateBookmarkUrl) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+  });
+}
 function throttle(fn, delay) {
   let timer = null
   return function(...args) {
@@ -75,13 +88,14 @@ function throttle(fn, delay) {
 const updateR = throttle(()=>window.ChromeUpdateBookmarkUrl().then((res)=>{
   console.log(res)
   if(!res) {
-    alert("更新收藏的网址失败，请注意可能造成数据丢失")
+    result.value = "更新收藏的网址失败，请注意可能造成数据丢失"
   }
   if(res.code === 2) {
-    alert(res.message)
-  }
-  if(res.code === 3) {
-    alert(res.message)
+    result.value = res.message
+  } else if(res.code === 3) {
+    result.value = res.message
+  } else {
+    result.value = ""
   }
 }), 500)
 watchEffect(() => {
@@ -93,10 +107,6 @@ watchEffect(() => {
 })
 function handleChangeCode(a: string) {
   if(!query.has('md')) return
-  if(!window.ChromeUpdateBookmarkUrl && !init) {
-    alert("尚检测到插件ID，无法更新收藏的网址，请注意可能造成数据丢失")
-  }
-  init = false
   text.value = a
 }
 </script>
