@@ -38,6 +38,9 @@ dependencies:
   hastscript:
     specifier: ^9.0.0
     version: 9.0.0
+  juejin-markdown-themes:
+    specifier: ^1.34.0
+    version: 1.34.0
   remark-directive:
     specifier: ^2.0.1
     version: 2.0.1
@@ -1512,6 +1515,10 @@ packages:
     hasBin: true
     dependencies:
       argparse: 2.0.1
+    dev: false
+
+  /juejin-markdown-themes@1.34.0:
+    resolution: {integrity: sha512-oislBW4mmMLfLFNLO+ywtcRd9eWBs8A9wE9w4ENqAkbRquSJKaBQX+4m6r3P+gLft4bvAMUhD+6ASRf2AWPL8A==}
     dev: false
 
   /kleur@4.1.5:
