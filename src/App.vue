@@ -68,7 +68,7 @@ if(query.has('md')) {
   })
   window.addEventListener('beforeunload',
     function (e) {
-        conosle.log(result.string)
+        console.log(result.string)
         if (result.string !== '' || !window.ChromeUpdateBookmarkUrl) {
           e.preventDefault();
           e.returnValue = '';
