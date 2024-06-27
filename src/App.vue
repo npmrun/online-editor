@@ -68,8 +68,8 @@ if(query.has('md')) {
   })
   window.addEventListener('beforeunload',
     function (e) {
-        console.log(result.string)
-        if (result.string !== '' || !window.ChromeUpdateBookmarkUrl) {
+        console.log(result.value)
+        if (result.value !== '' || !window.ChromeUpdateBookmarkUrl) {
           e.preventDefault();
           e.returnValue = '';
         }
@@ -112,6 +112,12 @@ function handleChangeCode(a: string) {
   if(!query.has('md')) return
   text.value = a
 }
+
+const showImage = ref(false)
+function handleGetImage(e){
+  e.preventDefault()
+  showImage.value = !showImage.value
+}
 </script>
 
 <template>
@@ -123,7 +129,12 @@ function handleChangeCode(a: string) {
       <a href="/?vue26#eNo9T9FuwyAM/BXLT5u0gtJKe4hYtf0HL6x4K1MgCJxsUpR/n0naIgQ+22ffLfiRs5onwh5NvZSQ+WwT/eWxMHj6ctPAsNgE4B27p+ctBCjEU0l7oZ1Yv3vojqcdr+2TR67Rj6ECmGIeHJMgAOPDvAUSXrvzsrQpsK5GC7rlQ8oTw3yIo6fhzaJ0WNzZeqcb/RiKLxhiE36ILqufOiYxtUm0t0K12N9FWxTXDVu8Mufaa33xSWiyKcxFJWKdctTS9X5Ur6o7ycbKDSuqUX2W8bdSEYLFu19c/wFNam6P" class="mr-5">vue2.6 sfc</a>
       <a href="/?sand-react-js" class="mr-5">sand-react-js</a>
       <a href="/?player" class="mr-5">codeplayer</a>
-      <a href="/?md">markdown</a>
+      <a href="/?md" class="mr-5">markdown</a>
+      <a @click="handleGetImage">picsum.photos</a>
+    </div>
+    <div v-if="showImage">
+    <a href="https://picsum.photos/" target="_blank">https://picsum.photos/</a>
+    <img src="https://picsum.photos/45">
     </div>
     <template v-if="curEditor === 'vue'">
       <VueEditor class="h-[100%]"></VueEditor>
