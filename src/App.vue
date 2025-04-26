@@ -1,14 +1,30 @@
 <script setup lang="ts">
-import FlemsEditor from '@/components/flems-editor/index.vue';
-import VueEditor from '@/components/VueEditor/VueEditor.vue';
-import Vue2Editor from '@/components/Vue2Editor/Vue2Editor.vue';
-import SandPack from '@/components/SandPack/SandPack.vue';
-import codeplayer from '@/components/codeplayer/index.vue';
-import MdEditor from '@/components/MdEditor/MdEditor.vue'
 import { utoa, atou } from '@/utils';
-import { ref, watchEffect, toRaw, watch, nextTick, onMounted } from 'vue';
+import { ref, watchEffect, toRaw, watch, nextTick, onMounted, defineAsyncComponent } from 'vue';
 import { watchDeep } from '@vueuse/core';
 import { v4 as uuidv4 } from 'uuid';
+
+const FlemsEditor = defineAsyncComponent(() =>
+  import('@/components/flems-editor/index.vue')
+);
+const VueEditor = defineAsyncComponent(() =>
+  import('@/components/VueEditor/VueEditor.vue')
+);
+const Vue2Editor = defineAsyncComponent(() =>
+  import('@/components/Vue2Editor/Vue2Editor.vue')
+);
+const SandPack = defineAsyncComponent(() =>
+  import('@/components/SandPack/SandPack.vue')
+);
+const codeplayer = defineAsyncComponent(() =>
+  import('@/components/codeplayer/index.vue')
+);
+const MdEditor = defineAsyncComponent(() =>
+  import('@/components/MdEditor/MdEditor.vue')
+);
+const RCode = defineAsyncComponent(() =>
+  import('@/components/Code/Code.vue')
+);
 
 const curEditor = ref('flems');
 window.uuid 
@@ -36,6 +52,9 @@ if (query.has('sand-react-js')) {
 }
 if (query.has('player')) {
   curEditor.value = 'player';
+}
+if (query.has('code')) {
+  curEditor.value = 'code';
 }
 const key = ref(0)
 if (query.has('md')) {
@@ -130,6 +149,7 @@ function handleGetImage(e){
       <a href="/?sand-react-js" class="mr-5">sand-react-js</a>
       <a href="/?player" class="mr-5">codeplayer</a>
       <a href="/?md" class="mr-5">markdown</a>
+      <a href="/?code" class="mr-5">code</a>
       <a @click="handleGetImage">picsum.photos</a>
     </div>
     <div v-if="showImage">
@@ -153,6 +173,9 @@ function handleGetImage(e){
     </template>
     <template v-if="curEditor === 'md'">
       <MdEditor style="height:100%" :value="text" @change="(v: string) => handleChangeCode(v)"></MdEditor>
+    </template>
+    <template v-if="curEditor === 'code'">
+      <RCode></RCode>
     </template>
   </div>
 </template>

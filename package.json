@@ -29,9 +29,12 @@
     "vue2-repl": "^0.2.1"
   },
   "devDependencies": {
+    "@types/codemirror": "^5.60.15",
     "@types/node": "^20.6.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "autoprefixer": "^10.4.15",
+    "codemirror": "5",
+    "codemirror-editor-vue3": "^2.8.0",
     "postcss": "^8.4.29",
     "sass": "^1.67.0",
     "tailwindcss": "^3.3.3",
