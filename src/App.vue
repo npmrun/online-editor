@@ -1,27 +1,15 @@
 <script setup lang="ts">
+import FlemsEditor from '@/components/flems-editor/index.vue';
+import VueEditor from '@/components/VueEditor/VueEditor.vue';
+import Vue2Editor from '@/components/Vue2Editor/Vue2Editor.vue';
+import SandPack from '@/components/SandPack/SandPack.vue';
+import codeplayer from '@/components/codeplayer/index.vue';
+import MdEditor from '@/components/MdEditor/MdEditor.vue'
 import { utoa, atou } from '@/utils';
 import { ref, watchEffect, toRaw, watch, nextTick, onMounted, defineAsyncComponent } from 'vue';
 import { watchDeep } from '@vueuse/core';
 import { v4 as uuidv4 } from 'uuid';
 
-const FlemsEditor = defineAsyncComponent(() =>
-  import('@/components/flems-editor/index.vue')
-);
-const VueEditor = defineAsyncComponent(() =>
-  import('@/components/VueEditor/VueEditor.vue')
-);
-const Vue2Editor = defineAsyncComponent(() =>
-  import('@/components/Vue2Editor/Vue2Editor.vue')
-);
-const SandPack = defineAsyncComponent(() =>
-  import('@/components/SandPack/SandPack.vue')
-);
-const codeplayer = defineAsyncComponent(() =>
-  import('@/components/codeplayer/index.vue')
-);
-const MdEditor = defineAsyncComponent(() =>
-  import('@/components/MdEditor/MdEditor.vue')
-);
 const RCode = defineAsyncComponent(() =>
   import('@/components/Code/Code.vue')
 );
