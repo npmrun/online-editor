@@ -141,20 +141,22 @@ function handleGetImage(e){
 
 <template>
   <div style="height: 100%;display: flex;flex-direction: column;" :class="isInIframe ? 'in-iframe' : ''">
-    <div class="header">
-      <a href="/" class="mr-5">flem</a>
-      <a href="/?vue" class="mr-5">vue3 sfc</a>
-      <a href="/?vue27" class="mr-5">vue2.7 sfc</a>
-      <a href="/?vue26#eNo9T9FuwyAM/BXLT5u0gtJKe4hYtf0HL6x4K1MgCJxsUpR/n0naIgQ+22ffLfiRs5onwh5NvZSQ+WwT/eWxMHj6ctPAsNgE4B27p+ctBCjEU0l7oZ1Yv3vojqcdr+2TR67Rj6ECmGIeHJMgAOPDvAUSXrvzsrQpsK5GC7rlQ8oTw3yIo6fhzaJ0WNzZeqcb/RiKLxhiE36ILqufOiYxtUm0t0K12N9FWxTXDVu8Mufaa33xSWiyKcxFJWKdctTS9X5Ur6o7ycbKDSuqUX2W8bdSEYLFu19c/wFNam6P" class="mr-5">vue2.6 sfc</a>
-      <a href="/?sand-react-js" class="mr-5">sand-react-js</a>
-      <a href="/?player" class="mr-5">codeplayer</a>
-      <a href="/?md" class="mr-5">markdown</a>
-      <a href="/?code" class="mr-5">code</a>
-      <a @click="handleGetImage">picsum.photos</a>
-    </div>
-    <div v-if="showImage">
-    <a href="https://picsum.photos/" target="_blank">https://picsum.photos/</a>
-    <img src="https://picsum.photos/45">
+    <nav class="header">
+      <div class="nav-container">
+        <a href="/" class="nav-item">flem</a>
+        <a href="/?vue" class="nav-item">vue3 sfc</a>
+        <a href="/?vue27" class="nav-item">vue2.7 sfc</a>
+        <a href="/?vue26#eNo9T9FuwyAM/BXLT5u0gtJKe4hYtf0HL6x4K1MgCJxsUpR/n0naIgQ+22ffLfiRs5onwh5NvZSQ+WwT/eWxMHj6ctPAsNgE4B27p+ctBCjEU0l7oZ1Yv3vojqcdr+2TR67Rj6ECmGIeHJMgAOPDvAUSXrvzsrQpsK5GC7rlQ8oTw3yIo6fhzaJ0WNzZeqcb/RiKLxhiE36ILqufOiYxtUm0t0K12N9FWxTXDVu8Mufaa33xSWiyKcxFJWKdctTS9X5Ur6o7ycbKDSuqUX2W8bdSEYLFu19c/wFNam6P" class="nav-item">vue2.6 sfc</a>
+        <a href="/?sand-react-js" class="nav-item">sand-react-js</a>
+        <a href="/?player" class="nav-item">codeplayer</a>
+        <a href="/?md" class="nav-item">markdown</a>
+        <a href="/?code" class="nav-item">code</a>
+        <a @click="handleGetImage" class="nav-item">picsum.photos</a>
+      </div>
+    </nav>
+    <div v-if="showImage" class="image-preview">
+      <a href="https://picsum.photos/" target="_blank" class="picsum-link">https://picsum.photos/</a>
+      <img src="https://picsum.photos/45" class="preview-image">
     </div>
     <template v-if="curEditor === 'vue'">
       <VueEditor class="h-[100%]"></VueEditor>
@@ -180,7 +182,7 @@ function handleGetImage(e){
   </div>
 </template>
 
-<style>
+<style lang="scss">
 @import '@/assets/style/common.scss';
 
 .in-iframe .header {
@@ -190,11 +192,77 @@ function handleGetImage(e){
   display: none !important;
 }
 
-.CodeMirror.cm-s-default{
-  height: 100%;
+.header {
+  background: #1a1a1a;
+  // padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.bytemd{
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-item {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  
+  &:hover {
+    background: #333;
+    color: #fff;
+  }
+}
+
+.image-preview {
+  padding: 1rem;
+  background: #f5f5f5;
+  border-bottom: 1px solid #eee;
+  
+  .picsum-link {
+    color: #2196f3;
+    text-decoration: none;
+    margin-right: 1rem;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  .preview-image {
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.CodeMirror.cm-s-default {
   height: 100%;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.bytemd {
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+:root {
+  --primary-color: #2196f3;
+  --background-color: #ffffff;
+  --text-color: #333333;
+}
+
+body {
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 </style>

@@ -1,9 +1,95 @@
-@import "./prefix.css";
-@import 'vue2-repl/style.css';
-@import 'codeplayer/dist/style.css';
-@import 'bytemd/dist/index.css';
-@import 'juejin-markdown-themes/dist/juejin.min.css';
+@use "./prefix.css" as *;
+@use 'vue2-repl/style.css' as *;
+@use 'codeplayer/dist/style.css' as *;
+@use 'bytemd/dist/index.css' as *;
+@use 'juejin-markdown-themes/dist/juejin.min.css' as *;
 
 html,body, #app{
   height: 100%;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+  
+  &:hover {
+    background: #555;
+  }
+}
+
+.editor-container {
+  border-radius: 6px;
+  overflow: hidden;
+  
+  .editor-header {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.button {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+  
+  &:hover {
+    background: #1976d2;
+  }
+  
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+// 响应式布局
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 1rem;
+  }
+  
+  .nav-item {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+// 深色主题支持
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #121212;
+    color: #e0e0e0;
+  }
+  
+  .button {
+    background: #1976d2;
+    
+    &:hover {
+      background: #1565c0;
+    }
+  }
 }
