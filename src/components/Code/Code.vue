@@ -18,7 +18,11 @@
                 <button class="action-button reset-button" @click="reset">
                     重置
                 </button>
-                <button class="action-button reset-button" @click="copy">
+                <button
+                    class="action-button reset-button"
+                    :class="{ copied: hasCopied }"
+                    @click="copy"
+                >
                     复制
                 </button>
             </div>
@@ -51,6 +55,10 @@ const cmOptions: EditorConfiguration = {
     mode: "text/javascript",
 };
 
+// 添加复制状态和代码是否修改的标记
+const hasCopied = ref(false);
+const isCodeModified = ref(false);
+
 onUnmounted(() => {
     cmRef.value?.destroy();
 });
@@ -59,10 +67,6 @@ const output = ref();
 const outputList = ref<any[]>([]);
 const run = useThrottleFn(() => {
     const iframe = document.createElement("iframe");
-    // iframe.style.display = "none";
-    // iframe.setAttribute("sandbox", "allow-scripts");
-    // iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
-    // iframe.src = "about:blank";
     iframe.srcdoc = "";
     iframe.onload = () => {
         if (!iframe.contentWindow) return;
@@ -79,7 +83,6 @@ const run = useThrottleFn(() => {
             },
         });
         const js = contentDocument.createElement("script");
-        //with(eval){}
         const code = `${text.value}`.toString();
         console.log("" + code);
 
@@ -87,9 +90,8 @@ const run = useThrottleFn(() => {
 try{new Function(\`${text.value
             .toString()
             .replaceAll("\n", "\\n")
-            // .replaceAll(/\\/g, "\\\\")
             .replaceAll("`", "\\`")
-            .replaceAll(/\$/g, "\\$")}\`)()}catch(e){console.log(e);throw e}
+            .replaceAll(/\$/g, "\\$")}\`)()}catch(e){console.log(e);}
 `;
         contentDocument.body.appendChild(js);
         js.onload = () => {
@@ -102,20 +104,56 @@ try{new Function(\`${text.value
     };
     output.value.appendChild(iframe);
 }, 100);
+
 const oldText = atou(location.hash.slice(1));
 const text = ref(oldText);
+
 watch(
     () => text.value,
     () => {
         history.replaceState({}, "", `?code#` + utoa(text.value));
+        isCodeModified.value = text.value !== oldText;
+        hasCopied.value = false;
         run();
     }
 );
+
+// 添加复制功能
+async function copy() {
+    try {
+        await navigator.clipboard.writeText(location.href);
+        hasCopied.value = true;
+        alert("代码已复制到剪贴板！");
+    } catch (err) {
+        console.error("复制失败:", err);
+        alert("复制失败，请手动复制。");
+    }
+}
+
 function reset() {
     text.value = oldText;
+    isCodeModified.value = false;
+    hasCopied.value = false;
     run();
 }
-onMounted(reset);
+
+// 添加页面离开提示
+onMounted(() => {
+    reset();
+    window.addEventListener("beforeunload", handleBeforeUnload);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+});
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+    if (isCodeModified.value && !hasCopied.value) {
+        const message = "您修改的代码尚未复制，确定要离开吗？";
+        e.returnValue = message;
+        return message;
+    }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -212,6 +250,11 @@ onMounted(reset);
 
             &:active {
                 transform: scale(0.98);
+            }
+
+            &.copied {
+                background: #4caf50;
+                color: white;
             }
         }
 
