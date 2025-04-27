@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <div class="left">
+        <div class="left" :style="{ width: leftWidth + '%' }">
             <Codemirror
                 v-model:value="text"
                 :options="cmOptions"
@@ -10,7 +10,8 @@
             >
             </Codemirror>
         </div>
-        <div class="right">
+        <div class="resizer" @mousedown="startResize"></div>
+        <div class="right" :style="{ width: (100 - leftWidth) + '%' }">
             <div class="button-group">
                 <button class="action-button run-button" @click="run">
                     运行
@@ -23,7 +24,7 @@
                     :class="{ copied: hasCopied }"
                     @click="copy"
                 >
-                    复制
+                    复制网址
                 </button>
             </div>
             <div ref="output" class="output-container">
@@ -154,6 +155,49 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
         return message;
     }
 }
+
+// 添加拖拽相关的状态
+const leftWidth = ref(50); // 默认左侧宽度50%
+let isResizing = false;
+
+// 开始拖拽
+function startResize(e: MouseEvent) {
+    isResizing = true;
+    const startX = e.clientX;
+    const startWidth = leftWidth.value;
+    
+    // 添加禁止选择类
+    document.body.classList.add('resizing');
+
+    // 添加鼠标移动和松开事件监听
+    function onMouseMove(e: MouseEvent) {
+        if (!isResizing) return;
+        
+        const delta = e.clientX - startX;
+        const containerWidth = document.querySelector('.wrapper')?.clientWidth || 0;
+        const newWidth = startWidth + (delta / containerWidth * 100);
+        
+        // 限制宽度在20%到80%之间
+        leftWidth.value = Math.min(Math.max(newWidth, 20), 80);
+    }
+
+    function onMouseUp() {
+        isResizing = false;
+        // 移除禁止选择类
+        document.body.classList.remove('resizing');
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+}
+
+// 在组件卸载时确保清理事件监听
+onUnmounted(() => {
+    document.removeEventListener('mousemove', () => {});
+    document.removeEventListener('mouseup', () => {});
+});
 </script>
 
 <style lang="scss" scoped>
@@ -163,11 +207,12 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
     display: flex;
     overflow: hidden;
     background: #f5f5f5;
-    gap: 16px;
+    gap: 0; // 移除原有的gap，因为现在我们使用resizer
     padding: 16px;
 
     .left {
-        width: 50%;
+        height: 100%;
+        transition: width 0.05s ease;
         flex-shrink: 0;
         border-radius: 8px;
         overflow: hidden;
@@ -223,8 +268,41 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
         }
     }
 
+    .resizer {
+        width: 6px;
+        margin: 0 8px;
+        background: transparent;
+        position: relative;
+        cursor: col-resize;
+        transition: background-color 0.2s;
+
+        &:hover,
+        &:active {
+            background: #2196f3;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 40px;
+            background: #ccc;
+            border-radius: 1px;
+            transition: background-color 0.2s;
+        }
+
+        &:hover::after,
+        &:active::after {
+            background: #fff;
+        }
+    }
+
     .right {
-        width: 50%;
+        height: 100%;
+        transition: width 0.05s ease;
         flex-shrink: 0;
         overflow: auto;
         display: flex;
@@ -291,6 +369,22 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
                 }
             }
         }
+    }
+}
+
+// 拖拽时禁用文本选择
+:global(.resizing) {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    cursor: col-resize !important;
+
+    * {
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
     }
 }
 </style>
