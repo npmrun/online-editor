@@ -121,12 +121,55 @@ watch(
 
 // 添加复制功能
 async function copy() {
+    const textToCopy = location.href;
+    
+    // 首先尝试使用 Clipboard API
     try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(textToCopy);
         hasCopied.value = true;
         alert("代码已复制到剪贴板！");
+        return;
     } catch (err) {
-        console.error("复制失败:", err);
+        console.log("Clipboard API 失败，尝试备用方法");
+    }
+
+    // 备用方法：使用临时文本区域
+    try {
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        
+        // 防止滚动
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.width = '2em';
+        textArea.style.height = '2em';
+        textArea.style.padding = '0';
+        textArea.style.border = 'none';
+        textArea.style.outline = 'none';
+        textArea.style.boxShadow = 'none';
+        textArea.style.background = 'transparent';
+        
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                hasCopied.value = true;
+                alert("代码已复制到剪贴板！");
+            } else {
+                throw new Error('复制失败');
+            }
+        } catch (err) {
+            console.error('execCommand 复制失败:', err);
+            alert("复制失败，请手动复制。");
+        }
+
+        document.body.removeChild(textArea);
+    } catch (err) {
+        console.error("备用复制方法失败:", err);
         alert("复制失败，请手动复制。");
     }
 }
