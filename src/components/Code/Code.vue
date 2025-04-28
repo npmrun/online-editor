@@ -1,8 +1,22 @@
 <template>
     <div class="wrapper">
         <div class="left" :style="{ width: leftWidth + '%' }">
+            <div class="button-group">
+                <button
+                    @click="curMode = 'editor'"
+                    class="action-button run-button"
+                >
+                    编辑器
+                </button>
+                <button
+                    @click="curMode = 'importmap'"
+                    class="action-button run-button"
+                >
+                    importmap
+                </button>
+            </div>
             <Codemirror
-                v-model:value="text"
+                v-model:value="curText"
                 :options="cmOptions"
                 border
                 ref="cmRef"
@@ -11,7 +25,7 @@
             </Codemirror>
         </div>
         <div class="resizer" @mousedown="startResize"></div>
-        <div class="right" :style="{ width: (100 - leftWidth) + '%' }">
+        <div class="right" :style="{ width: 100 - leftWidth + '%' }">
             <div class="button-group">
                 <button class="action-button run-button" @click="run">
                     运行
@@ -43,7 +57,15 @@
 
 <script setup lang="ts">
 import { utoa, atou } from "@/utils";
-import { ref, onMounted, watch, onUnmounted } from "vue";
+import {
+    ref,
+    onMounted,
+    watch,
+    onUnmounted,
+    watchEffect,
+    nextTick,
+    computed,
+} from "vue";
 import "codemirror/mode/javascript/javascript.js";
 import Codemirror from "codemirror-editor-vue3";
 import type { CmComponentRef } from "codemirror-editor-vue3";
@@ -65,63 +87,117 @@ onUnmounted(() => {
 
 const output = ref();
 const outputList = ref<any[]>([]);
-const run = useThrottleFn(() => {
-    const iframe = document.createElement("iframe");
-    iframe.srcdoc = "<!DOCTYPE html>";
-    iframe.onload = () => {
-        if (!iframe.contentWindow) return;
-        const contentWindow = iframe.contentWindow as any;
-        const contentDocument = iframe.contentDocument as any;
-        outputList.value = [];
-        contentWindow.console = new Proxy(contentWindow.console, {
-            get(target, p, receiver) {
-                let old = Reflect.get(target, p, receiver);
-                return function () {
-                    outputList.value.push(...arguments);
-                    old.call(target,...arguments);
-                    console.log(...arguments)
-                };
-            },
-        });
-        const js = contentDocument.createElement("script");
-        const code = `${text.value}`.toString().replaceAll("\n", "\\n")
-            .replaceAll("`", "\\`")
-            .replaceAll(/\$/g, "\\$");
-        js.type = "text/javascript"
-        js.innerText = `
-    try{(async()=>{
-        await new Function(\`${code}\`)();
-    })().catch(e=>console.log(e))}catch(e){console.log(e);}
-    `;
-        contentDocument.body.appendChild(js);
-        js.onload = () => {
-            js.remove();
-            iframe.remove();
+const run = useThrottleFn(
+    () => {
+        const iframe = document.createElement("iframe");
+        iframe.srcdoc = "<!DOCTYPE html>";
+        iframe.onload = () => {
+            if (!iframe.contentWindow) return;
+            const contentWindow = iframe.contentWindow as any;
+            const contentDocument = iframe.contentDocument as any;
+            outputList.value = [];
+            contentWindow.console = new Proxy(contentWindow.console, {
+                get(target, p, receiver) {
+                    let old = Reflect.get(target, p, receiver);
+                    return function () {
+                        outputList.value.push(...arguments);
+                        old.call(target, ...arguments);
+                        // console.log(...arguments)
+                    };
+                },
+            });
+            // @ts-ignore
+            contentWindow.onerror = (message, source, lineno, colno, error) => {
+                outputList.value.push("错误:" + message);
+                return true;
+            };
+            const importmap = contentDocument.createElement("script");
+            importmap.type = "importmap";
+            importmap.innerText = importmapRef.value;
+            contentDocument.body.appendChild(importmap);
+            const js = contentDocument.createElement("script");
+            js.setAttribute("async", "");
+            const code = `${text.value}`.toString();
+            // 需要用到new Function时可以替换到代码中的特殊字符导致异常
+            // .replaceAll("\n", "\\n")
+            // .replaceAll("`", "\\`")
+            // .replaceAll(/\$/g, "\\$");
+            js.type = "module";
+            const url = URL.createObjectURL(
+                new Blob([code], {
+                    type: "application/javascript",
+                })
+            );
+            // try{(async()=>{
+            //     await new Function(\`${code}\`)();
+            // })().catch(e=>console.log(e))}catch(e){console.log(e);}
+            js.src = url;
+            js.onload = () => {
+                URL.revokeObjectURL(url);
+                iframe.remove();
+            };
+            js.onerror = (e) => {
+                outputList.value.push(e.target.src + "异常");
+            };
+            contentDocument.body.appendChild(js);
         };
-        js.onerror = (e: any) => {
-            outputList.value.push(e);
-        };
-    };
-    output.value.appendChild(iframe);
-}, 100);
+        output.value?.appendChild(iframe);
+    },
+    100,
+    true
+);
 
 const oldText = atou(location.hash.slice(1));
-const text = ref(oldText);
+let kk: any = {};
+if (oldText) {
+    kk = JSON.parse(oldText);
+}
+const text = ref(kk.code ?? "");
+const importmapRef = ref(
+    kk.importmap ??
+        `{
+    "imports": {
+
+    }
+}`
+);
+
+const curMode = ref("editor"); // importmap
+const curText = computed({
+    set(value) {
+        if (curMode.value === "editor") {
+            text.value = value;
+        }
+        if (curMode.value === "importmap") {
+            importmapRef.value = value;
+        }
+    },
+    get() {
+        return curMode.value === "editor" ? text.value : importmapRef.value;
+    },
+});
 
 watch(
-    () => text.value,
+    () => [text.value, importmapRef.value],
     () => {
-        history.replaceState({}, "", `?code#` + utoa(text.value));
-        isCodeModified.value = text.value !== oldText;
+        const str = JSON.stringify({
+            code: text.value,
+            importmap: importmapRef.value,
+        });
+        history.replaceState({}, "", `?code#` + utoa(str));
+        isCodeModified.value = str !== oldText;
         hasCopied.value = false;
         run();
+    },
+    {
+        immediate: true,
     }
 );
 
 // 添加复制功能
 async function copy() {
     const textToCopy = location.href;
-    
+
     // 首先尝试使用 Clipboard API
     try {
         await navigator.clipboard.writeText(textToCopy);
@@ -136,33 +212,33 @@ async function copy() {
     try {
         const textArea = document.createElement("textarea");
         textArea.value = textToCopy;
-        
+
         // 防止滚动
-        textArea.style.position = 'fixed';
-        textArea.style.top = '0';
-        textArea.style.left = '0';
-        textArea.style.width = '2em';
-        textArea.style.height = '2em';
-        textArea.style.padding = '0';
-        textArea.style.border = 'none';
-        textArea.style.outline = 'none';
-        textArea.style.boxShadow = 'none';
-        textArea.style.background = 'transparent';
-        
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.width = "2em";
+        textArea.style.height = "2em";
+        textArea.style.padding = "0";
+        textArea.style.border = "none";
+        textArea.style.outline = "none";
+        textArea.style.boxShadow = "none";
+        textArea.style.background = "transparent";
+
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
 
         try {
-            const successful = document.execCommand('copy');
+            const successful = document.execCommand("copy");
             if (successful) {
                 hasCopied.value = true;
                 alert("代码已复制到剪贴板！");
             } else {
-                throw new Error('复制失败');
+                throw new Error("复制失败");
             }
         } catch (err) {
-            console.error('execCommand 复制失败:', err);
+            console.error("execCommand 复制失败:", err);
             alert("复制失败，请手动复制。");
         }
 
@@ -174,7 +250,14 @@ async function copy() {
 }
 
 function reset() {
-    text.value = oldText;
+    text.value = kk.code ?? "";
+    importmapRef.value =
+        kk.importmap ??
+        `{
+    "imports": {
+
+    }
+}`;
     isCodeModified.value = false;
     hasCopied.value = false;
     run();
@@ -207,18 +290,19 @@ function startResize(e: MouseEvent) {
     isResizing = true;
     const startX = e.clientX;
     const startWidth = leftWidth.value;
-    
+
     // 添加禁止选择类
-    document.body.classList.add('resizing');
+    document.body.classList.add("resizing");
 
     // 添加鼠标移动和松开事件监听
     function onMouseMove(e: MouseEvent) {
         if (!isResizing) return;
-        
+
         const delta = e.clientX - startX;
-        const containerWidth = document.querySelector('.wrapper')?.clientWidth || 0;
-        const newWidth = startWidth + (delta / containerWidth * 100);
-        
+        const containerWidth =
+            document.querySelector(".wrapper")?.clientWidth || 0;
+        const newWidth = startWidth + (delta / containerWidth) * 100;
+
         // 限制宽度在20%到80%之间
         leftWidth.value = Math.min(Math.max(newWidth, 20), 80);
     }
@@ -226,19 +310,19 @@ function startResize(e: MouseEvent) {
     function onMouseUp() {
         isResizing = false;
         // 移除禁止选择类
-        document.body.classList.remove('resizing');
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+        document.body.classList.remove("resizing");
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
     }
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
 }
 
 // 在组件卸载时确保清理事件监听
 onUnmounted(() => {
-    document.removeEventListener('mousemove', () => {});
-    document.removeEventListener('mouseup', () => {});
+    document.removeEventListener("mousemove", () => {});
+    document.removeEventListener("mouseup", () => {});
 });
 </script>
 
@@ -324,7 +408,7 @@ onUnmounted(() => {
         }
 
         &::after {
-            content: '';
+            content: "";
             position: absolute;
             left: 50%;
             top: 50%;
