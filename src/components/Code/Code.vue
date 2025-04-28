@@ -68,7 +68,7 @@ const output = ref();
 const outputList = ref<any[]>([]);
 const run = useThrottleFn(() => {
     const iframe = document.createElement("iframe");
-    iframe.srcdoc = "";
+    iframe.srcdoc = "<!DOCTYPE html>";
     iframe.onload = () => {
         if (!iframe.contentWindow) return;
         const contentWindow = iframe.contentWindow as any;
@@ -79,21 +79,20 @@ const run = useThrottleFn(() => {
                 let old = Reflect.get(target, p, receiver);
                 return function () {
                     outputList.value.push(...arguments);
-                    old(...arguments);
+                    old.call(target,...arguments);
+                    console.log(...arguments)
                 };
             },
         });
         const js = contentDocument.createElement("script");
         const code = `${text.value}`.toString();
-        console.log("" + code);
 
-        js.innerText = `
-try{new Function(\`${text.value
-            .toString()
+        js.type = "text/javascript"
+        const final_code = code
             .replaceAll("\n", "\\n")
             .replaceAll("`", "\\`")
-            .replaceAll(/\$/g, "\\$")}\`)()}catch(e){console.log(e);}
-`;
+            .replaceAll(/\$/g, "\\$")
+        js.innerText = `;(async function(){try{await (new Function(\`return async function(){${final_code}}()\`)())}catch(e){console.log(e);}})()`;
         contentDocument.body.appendChild(js);
         js.onload = () => {
             js.remove();
