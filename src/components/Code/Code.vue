@@ -49,7 +49,6 @@ import Codemirror from "codemirror-editor-vue3";
 import type { CmComponentRef } from "codemirror-editor-vue3";
 import type { EditorConfiguration } from "codemirror";
 import { useThrottleFn } from "@vueuse/core";
-import iframeText from "./iframe.html?raw";
 
 const cmRef = ref<CmComponentRef>();
 const cmOptions: EditorConfiguration = {
@@ -68,7 +67,7 @@ const output = ref();
 const outputList = ref<any[]>([]);
 const run = useThrottleFn(() => {
     const iframe = document.createElement("iframe");
-    iframe.srcdoc = "";
+    iframe.srcdoc = "<!DOCTYPE html>";
     iframe.onload = () => {
         if (!iframe.contentWindow) return;
         const contentWindow = iframe.contentWindow as any;
@@ -79,7 +78,8 @@ const run = useThrottleFn(() => {
                 let old = Reflect.get(target, p, receiver);
                 return function () {
                     outputList.value.push(...arguments);
-                    old(...arguments);
+                    old.call(target,...arguments);
+                    console.log(...arguments)
                 };
             },
         });
@@ -87,7 +87,7 @@ const run = useThrottleFn(() => {
         const code = `${text.value}`.toString().replaceAll("\n", "\\n")
             .replaceAll("`", "\\`")
             .replaceAll(/\$/g, "\\$");
-
+        js.type = "text/javascript"
         js.innerText = `
     try{(async()=>{
         await new Function(\`${code}\`)();
