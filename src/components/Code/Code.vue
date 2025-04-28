@@ -1,18 +1,20 @@
 <template>
     <div class="wrapper">
         <div class="left" :style="{ width: leftWidth + '%' }">
-            <div class="button-group">
+            <div class="mode-switcher">
                 <button
                     @click="curMode = 'editor'"
-                    class="action-button run-button"
+                    class="mode-button"
+                    :class="{ active: curMode === 'editor' }"
                 >
                     编辑器
                 </button>
                 <button
                     @click="curMode = 'importmap'"
-                    class="action-button run-button"
+                    class="mode-button"
+                    :class="{ active: curMode === 'importmap' }"
                 >
-                    importmap
+                    Import Map
                 </button>
             </div>
             <Codemirror
@@ -138,12 +140,13 @@ const run = useThrottleFn(
             };
             js.onerror = (e) => {
                 outputList.value.push(e.target.src + "异常");
+                iframe.remove();
             };
             contentDocument.body.appendChild(js);
         };
         output.value?.appendChild(iframe);
     },
-    100,
+    150,
     true
 );
 
@@ -391,6 +394,58 @@ onUnmounted(() => {
             width: 100%;
             height: 100% !important;
             font-family: "Consolas", "Monaco", monospace;
+        }
+    }
+
+    .mode-switcher {
+        display: flex;
+        gap: 1px;
+        background: #f0f0f0;
+        padding: 4px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .mode-button {
+        flex: 1;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: transparent;
+        color: #666;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+            color: #333;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        &.active {
+            background: white;
+            color: #2196f3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 24px;
+                height: 2px;
+                background: #2196f3;
+                border-radius: 2px;
+            }
+        }
+
+        &:active {
+            transform: scale(0.98);
         }
     }
 
