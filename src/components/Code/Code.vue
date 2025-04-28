@@ -84,24 +84,23 @@ const run = useThrottleFn(() => {
             },
         });
         const js = contentDocument.createElement("script");
-        const code = `${text.value}`.toString();
-        console.log("" + code);
+        const code = `${text.value}`.toString().replaceAll("\n", "\\n")
+            .replaceAll("`", "\\`")
+            .replaceAll(/\$/g, "\\$");
 
         js.innerText = `
-try{new Function(\`${text.value
-            .toString()
-            .replaceAll("\n", "\\n")
-            .replaceAll("`", "\\`")
-            .replaceAll(/\$/g, "\\$")}\`)()}catch(e){console.log(e);}
-`;
+    try{(async()=>{
+        await new Function(\`${code}\`)();
+    })().catch(e=>console.log(e))}catch(e){console.log(e);}
+    `;
         contentDocument.body.appendChild(js);
         js.onload = () => {
             js.remove();
+            iframe.remove();
         };
         js.onerror = (e: any) => {
             outputList.value.push(e);
         };
-        iframe.remove();
     };
     output.value.appendChild(iframe);
 }, 100);
